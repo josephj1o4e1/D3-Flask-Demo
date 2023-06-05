@@ -7,11 +7,11 @@
         <link rel="stylesheet" href="main.css">
     </head>
     <body>
-        <div id="chart">
-            {% block content %}{% endblock %}
+        <div class="container">
+            <h1>Choose a Visualization!</h1>
+            <br>
+            <p> >> <a href="/simple">Simple shape</a></p>
+            <p> >> <a href="/usmap">Choropleth Map</a></p>
         </div>
-
-        <script src="https://d3js.org/d3.v7.min.js"></script>
-        {% block script %}{% endblock %}
     </body>
 </html>
