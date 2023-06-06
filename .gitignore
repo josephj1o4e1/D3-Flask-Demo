@@ -1,4 +1,12 @@
 /txtNotes
 
-# environment variables
+# data
+/static/data
+
+# notebooks
+/notebooks
+
+# environment variables / config
 .env
+/config
+config.py
