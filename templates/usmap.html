@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block css %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/usmap.css') }}">
+
+{% endblock %}
+
+
+
+{% block content %}
+{% endblock %}
+
+
+
+{% block script %}
+
+<script>
+    const usJsonUrl = "{{ url_for('static', filename='data/us.json') }}";
+    const worldgeoJsonUrl = "{{ url_for('static', filename='data/world.geojson') }}";
+</script>
+<script src="https://d3js.org/d3-voronoi.v1.min.js"></script>
+<script src="https://d3js.org/topojson.v3.min.js"></script>
+<script src="{{ url_for('static', filename='js/usmap.js') }}"></script>
+
+{% endblock %}
