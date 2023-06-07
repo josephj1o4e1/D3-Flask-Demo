@@ -47,5 +47,10 @@ def usmap(): # casecountPerState
     return render_template("usmap.html") # render_template("usmap.html", data=jsondata)
 
 
+@app.route('/scatter')
+def usmap(): 
+    return render_template("scatter.html") # render_template("scatter.html", data=jsondata)
+
+
 if __name__ == "__main__":
     app.run(debug=True) # `debug=True` gives us a fancier flask debugger in the browser

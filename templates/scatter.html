@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block css %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/scatter.css') }}">
+
+{% endblock %}
+
+
+
+{% block content %}
+{% endblock %}
+
+
+
+{% block script %}
+
+<script>
+    // const projectData = "{{ url_for('static', filename='data/projectUSA.json') }}";
+    // const popData = "{{ url_for('static', filename='data/popUSA.json') }}";
+</script>
+
+<script src="{{ url_for('static', filename='js/scatter.js') }}"></script>
+
+{% endblock %}

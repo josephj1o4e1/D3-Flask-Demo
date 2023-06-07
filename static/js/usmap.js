@@ -1,3 +1,30 @@
+// import {us, states, statemesh, Choropleth, Legend} from "@d3/choropleth"
+const choropleth = d3.Choropleth;
+
+function UsStateChoropleth(data, {
+    features = states,
+    borders = statemesh,
+    width = 975,
+    height = 610,
+    ...options
+} = {}) {
+    // return Choropleth(data, {features, borders, width, height, ...options});
+    const myChoropleth = new choropleth(data, {features, borders, width, height, ...options});
+    return myChoropleth;
+}
+
+// chart = UsStateChoropleth(unemployment, {
+//     id: d => namemap.get(d.name),
+//     value: d => d.rate,
+//     scale: d3.scaleQuantize,
+//     domain: [1, 7],
+//     range: d3.schemeBlues[6],
+//     title: (f, d) => `${f.properties.name}\n${d?.rate}%`
+// })
+
+// unemployment = FileAttachment("unemployment201907.csv").csv({typed: true})
+
+////////////////////////////////////////////////////////////////////////////////////////
 // loads a GeoJSON file containing map data, applies a map projection, and draws the map using SVG path elements.
 
 const width = 400;
