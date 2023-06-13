@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "d3-color-legend": "^1.4.1"
+  }
+}

@@ -48,7 +48,7 @@ def usmap(): # casecountPerState
 
 
 @app.route('/scatter')
-def usmap(): 
+def scatter(): 
     return render_template("scatter.html") # render_template("scatter.html", data=jsondata)
 
 

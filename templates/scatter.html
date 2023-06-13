@@ -1,24 +1,37 @@
 {% extends "base.html" %}
 {% block css %}
-
 <link rel="stylesheet" href="{{ url_for('static', filename='css/scatter.css') }}">
-
 {% endblock %}
-
-
 
 {% block content %}
+<div class="container" id="chart"></div>
+<div class="container" id="filters">
+    <!-- Initialize a select button -->
+    <!-- <select id="selectButton"></select> -->
+    <datalist id="yearselector">
+        <!-- <option value="all" label="all"></option> -->
+        <option value="2009"></option>
+        <option value="2010"></option>
+        <option value="2011"></option>
+        <option value="2012"></option>
+        <option value="2013"></option>
+        <option value="2014"></option>
+        <option value="2015"></option>
+        <option value="2016"></option>
+        <option value="2017"></option>
+        <option value="2018"></option>
+        <option value="2019"></option>
+        <option value="2020"></option>
+    </datalist>
+</div>
 {% endblock %}
 
-
-
 {% block script %}
-
 <script>
     // const projectData = "{{ url_for('static', filename='data/projectUSA.json') }}";
     // const popData = "{{ url_for('static', filename='data/popUSA.json') }}";
 </script>
 
-<script src="{{ url_for('static', filename='js/scatter.js') }}"></script>
 
+<script src="{{ url_for('static', filename='js/scatter.js') }}"></script>
 {% endblock %}

@@ -8,9 +8,7 @@
         {% block css %}{% endblock %}
     </head>
     <body>
-        <div class=container id="chart">
-            {% block content %}{% endblock %}
-        </div>
+        {% block content %}{% endblock %}
 
         <script src="https://d3js.org/d3.v7.min.js"></script>
         {% block script %}{% endblock %}
