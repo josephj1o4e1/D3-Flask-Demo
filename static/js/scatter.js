@@ -43,16 +43,18 @@ d3.csv("static/data/ProjectDataUSA-week3.csv").then( function(data) {
 
 
     // create yearSlider input element in the DOM with initial values.
-    const yearSlider = document.createElement("input");
-    yearSlider.id = "yearslider";
-    yearSlider.type = "range";
+    // const yearSlider = document.createElement("input");
+    // const yearIndicator = document.createElement("div");
+    const yearSlider = document.getElementById("yearSlider");
+    const yearIndicator = document.getElementById("yearIndicator");
     yearSlider.min = 2009; // Minimum year value
     yearSlider.max = 2020; // Maximum year value
     yearSlider.step = 1; // Increment step
     // yearSlider.value = "all"; // "all"; // Initial value set to "all"
     yearSlider.list = "yearselector";
     yearSlider.setAttribute("list", "yearselector");
-    d3.select("#filters").node().appendChild(yearSlider);
+    // d3.select("#filters").node().appendChild(yearSlider);
+    // d3.select("#filters").node().appendChild(yearIndicator);
 
     dots = svg.append("g");
 
@@ -60,6 +62,7 @@ d3.csv("static/data/ProjectDataUSA-week3.csv").then( function(data) {
     function handleYearFilter() {
 
         const selectedValue = yearSlider.value;
+        yearIndicator.innerHTML = selectedValue;
         let filteredData;
         
         console.log(selectedValue);
