@@ -1,6 +1,6 @@
 // Define the dimensions and margins for the plot
 // set the dimensions and margins of the graph
-const margin = {top: 10, right: 30, bottom: 30, left: 60},
+const margin = {top: 10, right: 30, bottom: 40, left: 80},
     width = 460 - margin.left - margin.right,
     height = 400 - margin.top - margin.bottom;
 
@@ -33,6 +33,12 @@ d3.csv("static/data/ProjectDataUSA-week3.csv").then( function(data) {
     svg.append("g")
         .attr("transform", `translate(0, ${height})`)
         .call(d3.axisBottom(x));
+    // Add X axis label:
+    svg.append("text")
+        .attr("text-anchor", "end")
+        .attr("x", width)
+        .attr("y", height + margin.top + 25)
+        .text("Backers Count");
 
     // Add Y axis
     const y = d3.scaleLinear()
@@ -40,6 +46,13 @@ d3.csv("static/data/ProjectDataUSA-week3.csv").then( function(data) {
         .range([ height, 0]);
     svg.append("g")
         .call(d3.axisLeft(y));
+    // Y axis label:
+    svg.append("text")
+        .attr("text-anchor", "end")
+        .attr("transform", "rotate(-90)")
+        .attr("y", -margin.left+20)
+        .attr("x", -margin.top)
+        .text("Pledges (USD)")
 
 
     // create yearSlider input element in the DOM with initial values.
@@ -100,7 +113,7 @@ d3.csv("static/data/ProjectDataUSA-week3.csv").then( function(data) {
         // // Clear the previous dots
         // svg.selectAll(".dot").remove();
 
-        // Add dots
+        // Append circles for datapoints 'dots' 
         dots.selectAll("circle")
             .data(groupedData)
             .join("circle")
@@ -111,6 +124,18 @@ d3.csv("static/data/ProjectDataUSA-week3.csv").then( function(data) {
                 .style("stroke", d => colorScale(d.successRate))
                 // .text(d => d.CATEGORY)
                 ;
+        
+        // // Append labels for datapoints 'dots'
+        // dots.selectAll('text')
+        //     .data(data)
+        //     .join('text')
+        //         .attr('x', d => d.x + 8)
+        //         .attr('y', d => d.y)
+        //         .text(d => d.CATEGORY)
+        //         .style('font-size', '12px')
+        //         .style('fill', 'black');
+        
+        // // Label collision detection and adjustment
 
     }
 
