@@ -1,7 +1,7 @@
 // Define the dimensions and margins for the plot
 // set the dimensions and margins of the graph
 const margin = {top: 10, right: 30, bottom: 40, left: 80},
-    width = 460 - margin.left - margin.right,
+    width = 600 - margin.left - margin.right,
     height = 400 - margin.top - margin.bottom;
 
 // Create the SVG container
@@ -30,7 +30,7 @@ d3.csv("static/data/ProjectDataUSA-week3.csv").then( function(data) {
     const x = d3.scaleLinear()
         .domain([0, 200])
         .range([ 0, width ]);
-    svg.append("g")
+    xAxis = svg.append("g")
         .attr("transform", `translate(0, ${height})`)
         .call(d3.axisBottom(x));
     // Add X axis label:
@@ -44,7 +44,7 @@ d3.csv("static/data/ProjectDataUSA-week3.csv").then( function(data) {
     const y = d3.scaleLinear()
         .domain([0, 100000])
         .range([ height, 0]);
-    svg.append("g")
+    yAxis = svg.append("g")
         .call(d3.axisLeft(y));
     // Y axis label:
     svg.append("text")
@@ -70,7 +70,7 @@ d3.csv("static/data/ProjectDataUSA-week3.csv").then( function(data) {
     // d3.select("#filters").node().appendChild(yearIndicator);
 
     dots = svg.append("g");
-
+    // let groupedData;
     // create the handleYearFilter function
     function handleYearFilter() {
 
@@ -103,8 +103,8 @@ d3.csv("static/data/ProjectDataUSA-week3.csv").then( function(data) {
         );
                 
         // Convert aggregated data to an array
-        const groupedData = Array.from(aggregatedData, ([category, values]) => ({ category, ...values }));
-        
+        groupedData = Array.from(aggregatedData, ([category, values]) => ({ category, ...values }));
+        numPoints = groupedData.length
         // Define color scale for success rate
         const colorScale = d3.scaleLinear()
             .domain([0, 1]) // Assuming success rate is between 0 and 1
@@ -119,7 +119,7 @@ d3.csv("static/data/ProjectDataUSA-week3.csv").then( function(data) {
             .join("circle")
                 .attr("cx", function (d) { return x(d.avgBackersCount); } )
                 .attr("cy", function (d) { return y(d.avgPledgedInUSD); } )
-                .attr("r", 2)
+                .attr("r", 3)
                 .style("fill", "none")
                 .style("stroke", d => colorScale(d.successRate))
                 // .text(d => d.CATEGORY)
@@ -142,7 +142,27 @@ d3.csv("static/data/ProjectDataUSA-week3.csv").then( function(data) {
     // add input-type eventlistener on yearSlider. when triggered, it'll execute handleYearFilter again. 
     yearSlider.addEventListener("input", handleYearFilter);
 
-    // first execution of handleYearFilter. 
-    handleYearFilter();
+    // Zoom and Pan
+    function handleZoom(e) {
+        const verticalTranslation = `translate(${e.transform.x}, ${e.transform.y + height}) scale(${e.transform.k})`;
+        // apply transform to the chart / dots
+        dots.attr('transform', e.transform); // e.transform has three properties x, y and k. (k is the scale factor), pass e.transform directly into .attr
+        // Apply the same transform to the axes
+        xAxis.attr('transform', verticalTranslation);
+        yAxis.attr('transform', e.transform);
+    }
+    
+    let zoom = d3.zoom()
+        .scaleExtent([0.5, 4]) // Set the minimum and maximum zoom scale
+        .translateExtent([[0, 0], [width, height]]) // to specify bounds [[x0, y0], [x1, y1]] that the user can't pan outside of
+        .on('zoom', handleZoom);
+
+    function initZoom() {
+        d3.select('svg')
+            .call(zoom);
+    }
+    
+    initZoom();
+    handleYearFilter(); // updateData: first execution of handleYearFilter. 
 
 })
