@@ -11,3 +11,6 @@
 .env
 /config
 config.py
+
+# tempfiles
+/tmpfiles
