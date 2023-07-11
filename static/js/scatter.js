@@ -25,6 +25,8 @@ const svg = d3.select("#chart")
     .append("g")
     .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
+let anim = svg.transition().duration(750);
+
 // Add X axis
 const x = d3.scaleLinear()
     .domain([0, 200])
@@ -35,9 +37,10 @@ xAxis = svg.append("g")
 // Add X axis label:
 svg.append("text")
     .attr("text-anchor", "end")
-    .attr("x", width)
-    .attr("y", height + margin.top + 25)
-    .text("Backers Count");
+    .attr("x", width/2)
+    .attr("y", height + margin.top + 28)
+    .attr("font-weight", 600)
+    .text("Backers");
 
 // Add Y axis
 const y = d3.scaleLinear()
@@ -49,9 +52,10 @@ yAxis = svg.append("g")
 svg.append("text")
     .attr("text-anchor", "end")
     .attr("transform", "rotate(-90)")
-    .attr("y", -margin.left+20)
-    .attr("x", -margin.top)
-    .text("Pledges (USD)")
+    .attr("y", -margin.left+12)
+    .attr("x", -margin.top - (height/2) + 25)
+    .attr("font-weight", 600)
+    .text("Pledge")
 
 // Add a clipPath: everything out of this area won't be drawn.
 let clip = svg.append("defs")
