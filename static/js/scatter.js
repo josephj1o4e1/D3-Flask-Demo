@@ -8,7 +8,11 @@
 // 5. first execution of handleYearFilter. 
 
 
-
+let zoom = d3.zoom()
+    // .scaleExtent([0.5, 4]) // Set the minimum and maximum zoom scale
+    // // .translateExtent([[0, 0], [width, height]]) // to specify bounds [[x0, y0], [x1, y1]] that the user can't pan outside of
+    // .translateExtent([[-20, 0], [600, 400]])
+    .on('zoom', handleZoom);
 
 // Define the dimensions and margins for the plot
 // set the dimensions and margins of the graph
@@ -22,18 +26,23 @@ const svg = d3.select("#chart")
     .append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
+    .call(zoom)
     .append("g")
     .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-let anim = svg.transition().duration(750);
+// let anim = svg.transition().duration(750);
+
+x0=[0, 200]
+y0=[0, 100000]
 
 // Add X axis
 const x = d3.scaleLinear()
-    .domain([0, 200])
+    .domain(x0)
     .range([ 0, width ]);
 xAxis = svg.append("g")
+    .attr("class", "grid-lines")
     .attr("transform", `translate(0, ${height})`)
-    .call(d3.axisBottom(x));
+    .call(d3.axisBottom(x).ticks(10).tickSize(-height));
 // Add X axis label:
 svg.append("text")
     .attr("text-anchor", "end")
@@ -44,10 +53,12 @@ svg.append("text")
 
 // Add Y axis
 const y = d3.scaleLinear()
-    .domain([0, 100000])
+    .domain(y0)
     .range([ height, 0]);
 yAxis = svg.append("g")
-    .call(d3.axisLeft(y));
+    .attr("class", "grid-lines")
+    .call(d3.axisLeft(y).ticks(10).tickSize(-width));
+    
 // Y axis label:
 svg.append("text")
     .attr("text-anchor", "end")
@@ -58,17 +69,18 @@ svg.append("text")
     .text("Pledge")
 
 // Add a clipPath: everything out of this area won't be drawn.
-let clip = svg.append("defs")
-  .append("svg:clipPath")
-  .attr("id", "clip")
-  .append("svg:rect")
-  .attr("width", width)
-  .attr("height", height)
-  .attr("x", 0)
-  .attr("y", 0);
+let clip = svg.append("defs") //"defs": store graphical objects that will be used at a later time. 
+    .append("svg:clipPath")
+    .attr("id", "clip")
+    .append("svg:rect")
+    .attr("width", width)
+    .attr("height", height)
+    .attr("x", 0)
+    .attr("y", 0);
 
 // Create the dots element under svg, where datapoint dots would take place (and also possibly a brush feature)
-dots = svg.append("g").attr("clip-path", "url(#clip)");
+let dots = svg.append("g").attr("clip-path", "url(#clip)");
+// let dots = svg.append("g")
 
 // Get yearSlider input element in the DOM.
 const yearSlider = document.getElementById("yearSlider");
@@ -83,56 +95,56 @@ yearIndicator.innerHTML = yearSlider.value;
 
 // Zoom and Pan
 function handleZoom(e) {
-    const verticalTranslation = `translate(${e.transform.x}, ${e.transform.y + height*e.transform.k}) scale(${e.transform.k})`;
+    // recover the new scale
+    newX = e.transform.rescaleX(x);
+    newY = e.transform.rescaleY(y);
+
+    // update axes with these new boundaries
+    xAxis.call(d3.axisBottom(newX).ticks(10).tickSize(-height));
+    yAxis.call(d3.axisLeft(newY).ticks(10).tickSize(-width));
+
+
     // apply transform to the chart / dots
-    dots.attr('transform', e.transform); // e.transform has three properties x, y and k. (k is the scale factor), pass e.transform directly into .attr
-    // Apply the same transform to the axes
-    xAxis.attr('transform', verticalTranslation); // xAxis.attr('transform', e.transform);
-    yAxis.attr('transform', e.transform);
+    // e.transform has three properties x, y and k. (k is the scale factor), pass e.transform directly into .attr
+    
+    // tip: needs to .selectAll("circle"), that applies to every single dot for transform rather than the whole dots group. 
+    // when clipping, it only reacts to the ones that were "selected". 
+    // order: selectAll -> transform -> clip
+
+    // If you don't use .selectAll('circle') and directly set the transform attribute of the dots group, the clipping method would miss the clips because the transform attribute of the group only applies to the group element itself, not its child elements (e.g., circles).
+    // When you apply transformations to a group element, it affects the positioning, scaling, and other attributes of the group as a whole. However, any child elements inside the group are not individually affected by this transformation. As a result, if the child elements (circles) have positions outside the boundaries defined by the clip path, they will not be clipped or hidden, and they may still be drawn outside the chart area.
+    // On the other hand, when you use .selectAll('circle'), you are selecting and applying transformations to each individual circle element inside the group. This means that each circle is affected individually by the zoom and pan transformations, and they correctly stay within the boundaries defined by the clip path. As a result, the clipping method works as expected, and any parts of the circles that extend outside the chart area are clipped or hidden, creating a visually appealing zoom and pan experience.
+    dots.selectAll("circle")
+        .attr('transform', e.transform); 
+
 }
 
-let zoom = d3.zoom()
-    .scaleExtent([0.5, 4]) // Set the minimum and maximum zoom scale
-    // .translateExtent([[0, 0], [width, height]]) // to specify bounds [[x0, y0], [x1, y1]] that the user can't pan outside of
-    .translateExtent([[-20, 0], [600, 400]])
-    .on('zoom', handleZoom);
+function updateChart(transform_func) {
+    let anim = d3.select('svg').transition().duration(750);
 
-function initZoom() {
-    d3.select('svg')
-        .call(zoom);
+    // recover the new scale
+    newX = transform_func.rescaleX(x);
+    newY = transform_func.rescaleY(y);
+
+    // update axes with these new boundaries
+    xAxis
+        .transition(anim)
+        .call(d3.axisBottom(newX).ticks(10).tickSize(-height));
+    yAxis
+        .transition(anim)
+        .call(d3.axisLeft(newY).ticks(10).tickSize(-width));
+    
+    // update circles
+    dots.selectAll("circle")
+        .transition(anim)
+        .attr('transform', transform_func); 
+
 }
+// .call(zoom.transform, transform)
 
-initZoom();
-
-// function updateChart(newX, newY) {
-//     // let t = SVG.transition().duration(750);
-//     anim = d3.select('svg').transition().duration(750);
-    
-//     // update axes with these new boundaries
-//     xAxis.transition(anim).call(d3.axisBottom(newX));
-//     yAxis.transition(anim).call(d3.axisLeft(newY));
-    
-//     // update circle position
-//     scatter
-//         .selectAll("circle")
-//         .transition(anim)
-//         .attr("cx", function(d) {
-//             return newX(d.Sepal_Length);
-//         })
-//         .attr("cy", function(d) {
-//             return newY(d.Petal_Length);
-//         });
-// }
-
-// function reset_zoom() {
-//     newX = x.domain(x0);
-//     newY = y.domain(y0);
-    
-//     updateChart(newX, newY);
-// }
-
-// let resetbutton = document.getElementById("resetZoom"); 
-// resetbutton.addEventListener("click", reset_zoom);
+function reset_zoom() {
+    updateChart(d3.zoomIdentity);
+}
 
 
 //Read the data
