@@ -62,7 +62,10 @@ const y = d3.scaleLinear()
 yAxis = svg.append("g")
     .attr("class", "grid-lines")
     .call(d3.axisLeft(y).ticks(10).tickSize(-width));
-    
+
+newX = x
+newY = y
+
 // Y axis label:
 svg.append("text")
     .attr("text-anchor", "end")
@@ -119,7 +122,9 @@ function handleZoom(e) {
     // When you apply transformations to a group element, it affects the positioning, scaling, and other attributes of the group as a whole. However, any child elements inside the group are not individually affected by this transformation. As a result, if the child elements (circles) have positions outside the boundaries defined by the clip path, they will not be clipped or hidden, and they may still be drawn outside the chart area.
     // On the other hand, when you use .selectAll('circle'), you are selecting and applying transformations to each individual circle element inside the group. This means that each circle is affected individually by the zoom and pan transformations, and they correctly stay within the boundaries defined by the clip path. As a result, the clipping method works as expected, and any parts of the circles that extend outside the chart area are clipped or hidden, creating a visually appealing zoom and pan experience.
     dots.selectAll("circle")
-        .attr('transform', e.transform); 
+        // .attr('transform', e.transform); 
+        .attr("cx", d => newX(d.avgBackersCount))
+        .attr("cy", d => newY(d.avgPledgedInUSD));
 
 }
 
@@ -141,14 +146,17 @@ function updateChart(transform_func) {
     // update circles
     dots.selectAll("circle")
         .transition(anim)
-        .attr('transform', transform_func); 
+        // .attr('transform', transform_func); 
+        .attr("cx", d => newX(d.avgBackersCount))
+        .attr("cy", d => newY(d.avgPledgedInUSD));
+        
 
 }
-// .call(zoom.transform, transform)
 
 function reset_zoom() {
     updateChart(d3.zoomIdentity);
 }
+
 
 
 //Read the data
@@ -213,9 +221,9 @@ d3.csv("static/data/ProjectDataUSA-week3.csv").then( function(data) {
         dots.selectAll("circle")
             .data(groupedData)
             .join("circle")
-                .attr("cx", function (d) { return x(d.avgBackersCount); } )
-                .attr("cy", function (d) { return y(d.avgPledgedInUSD); } )
-                .attr("r", 3)
+                .attr("cx", function (d) { return newX(d.avgBackersCount); } )
+                .attr("cy", function (d) { return newY(d.avgPledgedInUSD); } )
+                .attr("r", 4)
                 .style("fill", "white")
                 .style("stroke", d => colorScale(d.successRate))
                 // .text(d => d.CATEGORY)
@@ -237,6 +245,7 @@ d3.csv("static/data/ProjectDataUSA-week3.csv").then( function(data) {
         // // Label collision detection and adjustment
 
     }
+
     // add eventlistener on yearSlider.  
     yearSlider.addEventListener("input", handleYearFilter);
     handleYearFilter(); // updateData: first execution of handleYearFilter.
