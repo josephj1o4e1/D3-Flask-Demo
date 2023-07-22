@@ -30,7 +30,11 @@ const svg = d3.select("#chart")
     .append("g")
     .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-// let anim = svg.transition().duration(750);
+// create a tooltip
+const Tooltip = d3.select("#chart")
+    .append("div")
+    .style("opacity", 0)
+    .attr("class", "tooltip")
 
 x0=[0, 200]
 y0=[0, 100000]
@@ -175,15 +179,35 @@ d3.csv("static/data/ProjectDataUSA-week3.csv").then( function(data) {
             }), 
             d => d.CATEGORY
         );
-                
+
         // Convert aggregated data to an array
         groupedData = Array.from(aggregatedData, ([category, values]) => ({ category, ...values }));
-        numPoints = groupedData.length
+        
+        //numPoints = groupedData.length
         // Define color scale for success rate
         const colorScale = d3.scaleLinear()
             .domain([0, 1]) // Assuming success rate is between 0 and 1
             .range(["yellow", "red"]); // Adjust the colors as needed
         
+        // Three function that change the tooltip when user hover / move / leave a cell
+        const mouseover = function(event, d) {
+            Tooltip
+                .style("opacity", 1)
+        }
+        decimalPoints=3;
+        const mousemove = function(event, d) {
+            Tooltip
+                .html("Category: " + d.category + '<br>' + 
+                    "Backers Count: " + Math.round(d.avgBackersCount * Math.pow(10, decimalPoints)) / Math.pow(10, decimalPoints) + '<br>' + 
+                    "Pledge($): " + Math.round(d.avgPledgedInUSD * Math.pow(10, decimalPoints)) / Math.pow(10, decimalPoints)
+                )
+                .style("left", `${event.layerX+10}px`)
+                .style("top", `${event.layerY}px`)
+        }
+        const mouseleave = function(event, d) {
+            Tooltip
+                .style("opacity", 0)
+        }    
 
         // Append circles for datapoints 'dots' 
         dots.selectAll("circle")
@@ -192,9 +216,12 @@ d3.csv("static/data/ProjectDataUSA-week3.csv").then( function(data) {
                 .attr("cx", function (d) { return x(d.avgBackersCount); } )
                 .attr("cy", function (d) { return y(d.avgPledgedInUSD); } )
                 .attr("r", 3)
-                .style("fill", "none")
+                .style("fill", "white")
                 .style("stroke", d => colorScale(d.successRate))
                 // .text(d => d.CATEGORY)
+                .on("mouseover", mouseover)
+                .on("mousemove", mousemove) // corresponding data object bound to that circle is passed as the second argument (d) to the mousemove function.
+                .on("mouseleave", mouseleave)
                 ;
         
         // // Append labels for datapoints 'dots'
