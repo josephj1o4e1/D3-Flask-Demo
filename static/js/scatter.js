@@ -27,6 +27,7 @@ const svg = d3.select("#chart")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
     .call(zoom)
+    // .call(zoom.transform, d3.zoomIdentity)
     .append("g")
     .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
@@ -100,9 +101,8 @@ yearSlider.list = "yearselector";
 yearSlider.setAttribute("list", "yearselector");
 yearIndicator.innerHTML = yearSlider.value;
 
-// Zoom and Pan
+// Zoom and Pan 
 function handleZoom(e) {
-    // recover the new scale
     newX = e.transform.rescaleX(x);
     newY = e.transform.rescaleY(y);
 
@@ -149,12 +149,14 @@ function updateChart(transform_func) {
         // .attr('transform', transform_func); 
         .attr("cx", d => newX(d.avgBackersCount))
         .attr("cy", d => newY(d.avgPledgedInUSD));
-        
 
 }
 
 function reset_zoom() {
     updateChart(d3.zoomIdentity);
+    // reset_flag=1;
+    // e object of handleZoom(e) is not automatically updated when manually reset the zoom using d3.zoomIdentity.
+    // svg.call(zoom.transform, d3.zoomIdentity)
 }
 
 
